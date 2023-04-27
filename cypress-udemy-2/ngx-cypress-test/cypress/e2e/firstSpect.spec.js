@@ -133,6 +133,7 @@ describe('Our first suite', () => {
         .eq(1)
         .check({ force: true })
 
+
       cy.wrap(radioButtons)
         .first()
         .should('not.be.checked')
