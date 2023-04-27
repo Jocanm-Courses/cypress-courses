@@ -29,26 +29,130 @@ describe('Our first suite', () => {
 
   })
 
-  it.only('second test', () => {
+  it('second test', () => {
     cy.contains("Forms").click()
     cy.contains("Form Layouts").click()
     cy.get(".sidebar-toggle").click()
 
     cy.get("[data-cy='signInButton']")
 
-    cy.contains("[status='warning']","Sign in")
+    cy.contains("[status='warning']", "Sign in")
 
     cy.get("#inputEmail3")
       .parents("form")
       .find("button")
-      .should("contain","Sign in")
+      .should("contain", "Sign in")
       .parents("form")
       .find("nb-checkbox")
       .click()
 
-    cy.contains("nb-card","Horizontal form")
+    cy.contains("nb-card", "Horizontal form")
       .find("[type='email']")
       .type("email@gmail.com")
-      .should("have.value","email@gmail.com")
+      .should("have.value", "email@gmail.com")
+  })
+
+  it('then and wrap methods', async () => {
+    cy.contains("Forms").click()
+    cy.contains("Form Layouts").click()
+
+    // cy
+    //   .contains("nb-card", "Using the Grid")
+    //   .find("[for='inputEmail1']")
+    //   .should("contain.text", "Email")
+
+    // cy
+    //   .contains("nb-card", "Using the Grid")
+    //   .find("[for='inputPassword2']")
+    //   .should("contain.text", "Password")
+
+    // cy
+    //   .contains("nb-card", "Basic form")
+    //   .find("[for='exampleInputEmail1']")
+    //   .should("contain.text", "Email address")
+
+    // cy
+    //   .contains("nb-card", "Basic form")
+    //   .find("[for='exampleInputPassword1']")
+    //   .should("contain.text", "Password")
+
+    cy.contains("nb-card", "Using the Grid").then(firstForm => {
+      const emailLabelFirst = firstForm.find("[for='inputEmail1']").text()
+      const passwordLabelFirst = firstForm.find("[for='inputPassword2']").text()
+
+      expect(emailLabelFirst).to.equal("Email")
+      expect(passwordLabelFirst).to.equal("Password")
+
+      cy.contains("nb-card", "Basic form").then(secondForm => {
+        const emailLabelSecond = secondForm.find("[for='exampleInputEmail1']").text()
+        const passwordLabelSecond = secondForm.find("[for='exampleInputPassword1']").text()
+
+        expect(emailLabelSecond).to.equal("Email address")
+        expect(passwordLabelSecond).to.equal(passwordLabelFirst)
+
+        cy.wrap(secondForm).find("[for='exampleInputPassword1']").should("contain.text", passwordLabelFirst)
+      })
+    })
+  })
+
+  it('invoke command', () => {
+    cy.contains("Forms").click()
+    cy.contains("Form Layouts").click()
+
+    cy.get("[for='exampleInputEmail1']").should("contain.text", "Email address")
+
+    cy.get("[for='exampleInputEmail1']").then(label => {
+      expect(label.text()).to.equal("Email address")
+    })
+
+    cy.get("[for='exampleInputEmail1']").invoke("text").then(text => {
+      expect(text).to.equal("Email address")
+    })
+
+    cy.contains("nb-card", "Basic form")
+      .find("nb-checkbox")
+      .click()
+      .find("span.custom-checkbox")
+      .invoke("attr", "class")
+      .should("contain", "checked")
+    // .should("have.class", "checked")
+  })
+
+  it('radio buttons', () => {
+
+    cy.contains("Forms").click()
+    cy.contains("Form Layouts").click()
+
+    cy.contains('nb-card', 'Using the Grid').find("[type='radio']").then(radioButtons => {
+      cy.wrap(radioButtons)
+        .first()
+        .check({ force: true })
+        .should('be.checked')
+
+      cy.wrap(radioButtons)
+        .eq(1)
+        .check({ force: true })
+
+      cy.wrap(radioButtons)
+        .first()
+        .should('not.be.checked')
+
+      cy.wrap(radioButtons)
+        .eq(2)
+        .should('be.disabled')
+
+    })
+
+  })
+
+  it.only('check boxes', () => {
+    cy.contains("Modal & Overlays").click()
+    cy.contains("Toastr").click()
+
+    cy.get("[type='checkbox']").click({
+      force: true,
+      multiple: true
+    })
+
   })
 })
